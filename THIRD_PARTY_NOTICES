@@ -1,0 +1,29 @@
+AlfaCase interactive mockup
+==========================
+
+Runtime
+-------
+The current mockup uses handwritten HTML, CSS, JavaScript, inline SVG icons,
+synthetic fixtures and a Python standard-library export helper. No third-party
+runtime library, downloaded font, external image, LLM, AI service or dataset is
+bundled or contacted by the mockup. System fonts are supplied by the browser/OS.
+
+Simulated integrations and data
+------------------------------
+Alfa-Bank / Alfa-Business names refer to the challenge context. The bank shell,
+user, company profiles, relationship signals, news, research comments, quotes,
+role selection and agent traces are demonstrations, not real bank integrations.
+All fixture entities and content are synthetic. User-entered text is unverified.
+Actual supplied Alfa-Bank research and competition datasets are not included.
+The mockup does not attribute its synthetic analysis to a real bank position.
+
+Development validation tools (not bundled)
+-----------------------------------------
+Chromium was used for browser validation and screenshots.
+Puppeteer Core 25.14.0 (Apache-2.0) was used by the optional browser smoke runner.
+Mermaid 11.17.2 (MIT) was used to validate documentation diagrams.
+These tools are not loaded by the product pages or the self-contained HTML file.
+
+The supplied challenge PDF defines the intended approved-model list and data
+sources. Update these notices with the actual dependencies, model/provider,
+dataset provenance and relevant licenses as the full prototype is implemented.

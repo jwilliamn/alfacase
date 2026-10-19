@@ -145,6 +145,8 @@ Company-specific terms have more influence than sector alone. A rate event can r
 
 ## 5. The agent is an explicit state machine
 
+For explanatory role diagrams and the mapping from the current UI mockup to future Python code, see [Agent logic](AGENT_LOGIC.md). Update those diagrams when implementing a transition or changing its evidence checks.
+
 One original orchestrator is enough. The model selects a structured analysis plan and tool arguments; Python enforces scope, schemas, budgets, and transitions. This produces real autonomous tool use without introducing a framework.
 
 The prototype uses a custom Python state machine, with no LangGraph, LangChain agent orchestration, or prebuilt multi-agent system. Specialized research, impact, verification and decision roles are functions/prompts within that shared workflow. This keeps the agent logic under our control and follows the brief's requirement to implement it ourselves.

@@ -16,7 +16,7 @@ The first two layers cover the core brief. The third is the team's product diffe
 
 Treat “easy to rewrite using the models in the brief” as a design constraint: plain Python functions, a small number of modules, explicit JSON contracts, editable prompts, and one replaceable model adapter. The prototype should also support switching between approved inference models. Neither goal requires an agent framework or a distributed system.
 
-This is an implementation plan, not a claim that the service exists. The PDF supplies requirements; its instructions about submission, hosting, and repository access are recorded as future checklist items, not actions authorized by this planning request.
+This is an implementation plan. A [clickable UI mockup](../mockup/README.md) now exists, with synthetic sources, simulated agent steps, and a working scenario calculator. The backend, ingestion, retrieval and model integrations remain planned. The PDF supplies requirements; its instructions about submission, hosting, and repository access are recorded as future checklist items, not actions authorized by the planning request.
 
 ## 2. The smallest complete demonstration
 
@@ -130,7 +130,7 @@ Implementation handoffs should be narrow: “implement these schemas and the CSV
 
 ## 7. What must be verified
 
-Tests are planned below; none have run because this request is for planning.
+Full-prototype tests are planned below. [Mockup validation](../mockup/VALIDATION.md) covers the implemented UI interactions and JavaScript scenario arithmetic; it does not establish backend, live-source or approved-model readiness.
 
 | Check | Evidence required |
 |---|---|
