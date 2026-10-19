@@ -2,7 +2,17 @@
 
 ## 1. Goal and interpretation
 
-Build a small, interactive service that answers: **“What does this event change for my company, why, and what should I investigate next?”** It combines external news, company-specific exposures, the user's role, and relevant Alfa-Bank research. It must show its evidence and perform a real, bounded, multi-step analysis.
+Build a small, interactive service that answers: **“What does this event change for my company, what options do I have, and under which assumptions is each option preferable?”** It combines external news, company-specific exposures, the user's role, and relevant Alfa-Bank research. It must show its evidence and perform a real, bounded, multi-step analysis.
+
+### Three product layers
+
+| Layer | Role | Prototype output |
+|---|---|---|
+| **1. Intelligence** | Required foundation | Company profile → relevant news → Alfa-Bank research, with relevance reasons and source passages |
+| **2. Business Impact** | Required interpretation | Why it matters → financial exposure → risks and opportunities → evidence, including what cannot yet be quantified |
+| **3. Decision Intelligence** | Our differentiator, included in the prototype | Compare options → model scenarios → evaluate trade-offs → recommend next steps, starting with one financing decision template |
+
+The first two layers cover the core brief. The third is the team's product differentiator, supplied by the user's additional direction; it is not a claim about an extra PDF requirement. It consumes the grounded impact analysis and adds an interactive comparison. If numerical inputs are absent, the service requests them or offers a qualitative comparison rather than inventing exposure amounts.
 
 Treat “easy to rewrite using the models in the brief” as a design constraint: plain Python functions, a small number of modules, explicit JSON contracts, editable prompts, and one replaceable model adapter. The prototype should also support switching between approved inference models. Neither goal requires an agent framework or a distributed system.
 
@@ -15,9 +25,11 @@ This is an implementation plan, not a claim that the service exists. The PDF sup
 3. Open a ranked feed. Each card shows the event, why it matters to this company, evidence freshness, and the ranking explanation.
 4. Open an insight with six sections: what happened; why it matters here; possible consequences; possible next actions; the bank's view; supporting evidence.
 5. Inspect separate **Facts**, **Alfa-Bank analysis**, and **AI interpretation** labels. Open a source passage or bank PDF page and inspect an activity trace of tools and checks.
-6. Ask a follow-up question or switch the view to financing, cash flow, counterparties, or opportunities. Answers reuse the same company and evidence context, with additional retrieval when needed.
-7. Switch to another company in the same sector and observe different ranking and interpretation. Change role within one company and observe different emphasis.
-8. Import a previously unseen article through the admin/demo input, refresh the feed, and inspect its newly generated analysis. Submit useful/not useful feedback with an optional reason.
+6. Select **Compare options** on a financing insight. Confirm principal, current rate and repricing assumptions, horizon, a fixed-rate quote and fees, then compare keeping floating-rate borrowing with switching to the quoted fixed rate. Synthetic defaults are visibly labeled and editable.
+7. View falling, unchanged, and rising-rate scenarios side by side. Change an assumption and observe recalculated costs, the break-even rate, trade-offs, and a next-step recommendation tied to the selected objective and constraints.
+8. Ask a follow-up question or switch the view to financing, cash flow, counterparties, or opportunities. Answers reuse the same company and evidence context, with additional retrieval when needed; decision questions also reuse the versioned scenario inputs.
+9. Switch to another company in the same sector and observe different ranking and interpretation. Change role within one company and observe different emphasis.
+10. Import a previously unseen article through the admin/demo input, refresh the feed, and inspect its newly generated analysis. Submit useful/not useful feedback with an optional reason.
 
 Use a Russian interface and Russian insight output by default, matching the case. Keep developer documentation in English. Use a simple bank-style shell; a real internet-bank integration is not required for this prototype.
 
@@ -28,13 +40,22 @@ Use a Russian interface and Russian insight output by default, matching the case
 | Company and group context, user roles, company-specific ranking | Four synthetic companies across three sectors, including two in the same sector; two user roles | Exhaustive sector coverage |
 | Relationships from group IDs, payment edges, and anonymized person links | One-hop relationships and payment concentration calculations | Graph database and arbitrary graph traversal |
 | External-news parser and bank-research importer | One configurable RSS/HTML source plus manual text/URL import; PDF/text research import | Broad crawling, paywalls, continuous scraping |
-| Retrieval, structured extraction, deduplication, evidence links | SQLite full-text search, Russian query synonyms, metadata filters, simple near-duplicate matching | Vector database, embedding model, reranking service |
+| Retrieval, structured extraction, deduplication, evidence links | SQLite full-text search, Russian query synonyms, approved-model query reformulation, metadata filters, simple near-duplicate matching | Separate vector database and reranking service; vector indexing remains an evaluated extension |
 | Handwritten agent with planning, tools, context, self-check, retry | One orchestrator and bounded, read-only analysis tools | Multi-agent framework, autonomous browsing or execution |
 | Ranked feed, detailed insight, follow-up questions, feedback | Server-rendered pages and a small amount of JavaScript | Separate SPA and frontend build pipeline |
+| Decision Intelligence comparison | One financing template, two options including the current arrangement, three editable rate scenarios, visible formulas and an input form | Generic financial simulator, Monte Carlo, portfolio optimization, automatic execution |
 | Reproducible local/container startup and meaningful evaluation | One application container and one SQLite volume | Kubernetes, Redis, message brokers, production SSO |
 | Security boundaries and an extension/maintenance explanation | Basic scoped sessions, input validation, tool restrictions, redacted traces | Bank-grade identity integration and a full security platform |
 
 The case permits security mechanisms to be explained and located in the architecture for the prototype (p. 12). Implement the low-cost boundaries needed for a credible demo and document production replacements. Do not trade away evidence, actual bank research, unseen-news handling, or the agent loop: these are central requirements.
+
+### Decision Intelligence: a bounded differentiator
+
+Implement one reusable **floating versus fixed financing** template. Option A keeps the current arrangement; option B uses a user-entered fixed-rate quote and switching fee. Apply one shared set of falling/unchanged/rising-rate assumptions to both. News and bank research explain why a scenario is relevant; they do not establish a forecast, probability, or a real bank offer.
+
+Use ordinary Python/Decimal calculations with explicit annual rates, RUB amounts, a 90-day default horizon, and ACT/365 simple interest. Show the cost of each option in each scenario, its difference from the baseline, the worst cost within the tested scenarios, and the break-even floating rate. Display the formula and the status of each input: sourced, user-supplied, or synthetic. Let the approved model explain the returned figures and evidence; do not let it invent or perform the arithmetic.
+
+Offer two explicit objectives: **reduce the worst cost within these scenarios** or **reduce cost in the unchanged-rate scenario**. Make the recommendation conditional on the selected objective and a constraint such as the maximum acceptable upfront fee. Show the trade-off between the two objectives. If priorities conflict, show the alternatives and the condition that changes the preference. If a quote, repricing assumption, or required amount is missing, recommend obtaining it before a numerical comparison. This is a small decision aid, not a general optimizer.
 
 ## 4. Inputs and prerequisites
 
@@ -45,6 +66,7 @@ The case permits security mechanisms to be explained and located in the architec
 | Model endpoint and access | Brief promises a shared key and ₽500/day limit (p. 12); endpoint, model IDs, authentication, pricing, and current access are unknown | Confirm provider documentation and available approved models before implementing transport; use secure environment configuration for credentials |
 | External news | Choose one accessible, permitted RSS/HTML source during implementation | Respect source access conditions; capture source URL, publication time, retrieval time, and original text |
 | Demo fixtures | To be authored | Four fictional large companies with revenue above ₽15bn, about 20 news items, research examples, relation edges, noisy inputs, and two user personas |
+| Decision inputs | Not present in the PDF's company/product flags | Use labeled synthetic values for the self-contained demo, or user-supplied balances, terms, quotes and fees; preserve input provenance and the calculation assumptions |
 
 Important data limits:
 
@@ -60,9 +82,17 @@ Important data limits:
 
 Use **Python 3.12, FastAPI, Jinja2, minimal vanilla JavaScript, SQLite/FTS5, and Pydantic**. Use `httpx` for model/source HTTP, `feedparser` for RSS, a small HTML extractor, and `pypdf` for text PDFs. Keep the list short and pin the actual versions selected at implementation in `uv.lock`, the Python version file, and the Docker base image.
 
-Run one app process. Ingestion is an explicit CLI/admin operation; insights are generated on demand. Rank all events cheaply, then analyze only the opened event or a small requested set. Cache document extraction and completed analyses. No separate worker is necessary at demo scale.
+Run one app process. Ingestion is an explicit CLI/admin operation; insights are generated on demand. Rank all events cheaply, then analyze only the opened event or a small requested set. Cache document extraction and completed analyses. Scenario arithmetic runs locally and updates immediately when inputs change; rerun the model explanation only when requested, and mark any older explanation as belonging to the previous input version. No separate worker is necessary at demo scale.
 
 Use an original Python agent loop and local search. No external AI search service, hosted autonomous agent, or ready-made multi-agent system forms the core. Do not add an unapproved embedding LLM. Full diagrams and contracts are in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+### Retrieval: relational storage and a possible vector index
+
+Keep the retrieval interface independent of its implementation. SQLite owns structured profiles, relationships, source passages and provenance. FTS5 supplies the initial document index; the approved planner can reformulate a semantic question into multiple Russian keyword queries and compare the returned passages. This is a small-corpus baseline to test, not a claim that keyword retrieval always matches semantic search.
+
+A vector index can improve recall when company exposures, news and bank research use different wording. Compare the baseline against human-labeled relevant passages, including paraphrases and held-out news. If it misses necessary material, evaluate a hybrid lexical/vector retriever using the same pack and measure relevance, latency and cost. Begin with an in-process vector index alongside the same SQLite data if supported; a separate service such as Qdrant becomes worthwhile only when corpus size, concurrency or filtering requirements justify it. Adding a second database is not itself evidence of better retrieval.
+
+The approved LLM list does not identify an embedding model or endpoint. Confirm the competition/provider rules and availability before choosing one; do not silently add an external embedding service or fabricate numeric vectors with a chat model. This uncertainty need not block the initial live prototype. Preserve stable passage IDs and metadata so vectors can be added without changing the insight or decision contracts.
 
 ### Approved models and portability
 
@@ -83,7 +113,7 @@ Track input/output tokens, model, latency, and estimated ruble cost per run. Con
 
 ## 6. Build order and acceptance gates
 
-Planning estimate: **roughly 18–28 focused engineering hours**, assuming accessible assets and a usable model endpoint. This is an estimate, not a deadline commitment. Build one vertical slice first; use its evidence and contracts to guide the remaining work.
+Planning estimate: **roughly 21–33 focused engineering hours**, assuming accessible assets and a usable model endpoint. The decision comparison adds about 3–5 hours to the original 18–28-hour baseline. This is an estimate, not a deadline commitment. Build one vertical slice first; use its evidence and contracts to guide the remaining work.
 
 | Step | Effort | Deliverable and exit check |
 |---|---:|---|
@@ -91,9 +121,10 @@ Planning estimate: **roughly 18–28 focused engineering hours**, assuming acces
 | 2. Prove one insight end to end | 4–6h | One company, one unseen news text, one actual bank-research passage; real model produces a structured, cited insight through planned tool use and a recorded self-check; unsupported claims become caveats |
 | 3. Generalize ingestion and ranking | 3–5h | CSV adapters, RSS/HTML parser, PDF passages, deduplication, company/group/relationship features, explainable ranking; reimport is idempotent; two same-sector companies yield different rankings |
 | 4. Complete the interaction | 4–6h | Bank-style entry, company/role selection, feed/detail/source views, tool trace, follow-up and alternate lens, feedback, useful loading/error states; scripted demo works in a browser |
-| 5. Validate and package | 5–8h | Held-out tests, genuine retry/abstention demonstration, budget/error checks, clean container startup, README, notices, updated architecture, and recorded demo instructions |
+| 5. Add Decision Intelligence | 3–5h | Financing input form, two options × three scenarios, deterministic costs and break-even, visible assumptions, trade-offs and conditional next step; edits recalculate correctly and missing inputs prevent fabricated numbers |
+| 6. Validate and package | 5–8h | Held-out tests, genuine retry/abstention demonstration, scenario/recommendation checks, budget/error checks, clean container startup, README, notices, updated architecture, and recorded demo instructions |
 
-If time is tight, reduce the number of news sources, visual polish, and prefetched insights first. Keep a live model run, actual bank material, personalized ranking, citations, self-correction, follow-up, and reproducible startup.
+If time is tight, reduce the number of news sources, visual polish, and prefetched insights first. Keep a live model run, actual bank material, personalized ranking, citations, self-correction, follow-up, one complete decision comparison, and reproducible startup. Additional decision templates are optional.
 
 Implementation handoffs should be narrow: “implement these schemas and the CSV importer,” “implement the ranked feed against this response contract,” or “implement the agent loop against these tool functions.” Keep each step runnable before adding the next. Avoid asking a coding model to invent the entire system at once.
 
@@ -107,22 +138,27 @@ Tests are planned below; none have run because this request is for planning.
 | Personalized selection | At least three annotated events rank differently for same-sector companies with different product, geography, or relationship exposures; role switch changes emphasis without changing facts |
 | Context correctness | Missing values remain unknown; group/payment/person links have provenance; no fabricated market share, balances, job roles, or contract terms |
 | Ingestion and deduplication | RSS/HTML and PDF input work; two reports of one event share an event group but retain both sources; repeats do not duplicate records; changed content becomes a new version |
+| Retrieval quality | Human-labeled relevant bank passages are recovered for direct wording and paraphrased exposure questions; report passage recall separately from event-ranking quality and evaluate a vector extension if meaningful misses remain |
 | Unseen content | Five held-out articles are ingested through the same parser and analyzed without fixture-specific IDs or handwritten result selection |
 | Depth and bank contribution | An interpretation combines at least two supported company/event factors; a relevant actual bank passage demonstrably changes or qualifies the explanation; no matching bank evidence is disclosed |
 | Evidence | Every factual assertion and attributed bank view resolves to a stored source passage; every AI implication names its company feature/evidence basis and assumptions; invented citations are rejected |
 | Agent behavior | Trace contains a plan, real tool calls, retained context, self-check, and completion; a sparse/conflicting case causes a real new search or revision, then a qualified result or abstention if unresolved |
 | Follow-up | Question and alternate lens retain company/user scope, produce cited answers, and can retrieve additional evidence; switching company never reuses another company's private context |
+| Scenario arithmetic | Two options × three scenarios match independently checked formulas; horizon/rate/fee edits update costs and break-even; zero fees and equal rates behave correctly; malformed units or missing essential inputs do not produce invented figures |
+| Decision quality | Trade-offs include a baseline and conditional preference; changing the objective, upfront-fee constraint, or assumptions can change the next step; no universal “best” option or unsupported scenario probability; every figure maps to an input/calculation version |
 | Robustness | Malformed model JSON, timeout, empty search, unavailable source, noisy input, stale/conflicting research, and exhausted budget lead to explicit recoverable states rather than fabricated output |
 | Boundaries | Wrong-company requests are denied; document text cannot select arbitrary tools or URLs; secrets and unnecessary personal data are absent from browser payloads and traces |
-| Interaction | Browser smoke test completes entry → company/role → feed → insight → source → follow-up → company switch → feedback; this includes actual responses, not only rendered screenshots |
+| Interaction | Browser smoke test completes entry → company/role → feed → insight → source → compare options → edit scenario → next step → follow-up → company switch → feedback; this includes actual responses, not only rendered screenshots |
 
-Automate deterministic importer/ranker/schema/access/budget tests with pytest and a small browser smoke test with Playwright. A clearly labeled fixture model can make these tests repeatable, but it must never count as live agent validation. Run a separate opt-in integration check against an approved model and actual supplied bank research; record model, date, run ID, and outcome.
+Automate deterministic importer/ranker/schema/access/budget and independent scenario-calculation tests with pytest and a small browser smoke test with Playwright. A clearly labeled fixture model can make these tests repeatable, but it must never count as live agent validation. Run a separate opt-in integration check against an approved model and actual supplied bank research; record model, date, run ID, and outcome.
 
 ### Small evaluation and monitoring loop
 
 Prepare a compact evaluation pack: four company profiles, roughly 20 articles including five held-out items, two roles, human relevance labels, and a few missing/conflicting/adversarial examples. Report held-out performance separately from development cases; these numbers are prototype evidence, not statistical proof of generalization.
 
 Record precision@5 for company relevance; citation validity and manually judged support; factual error and unsupported-attribution counts; company-specific usefulness; successful retry/abstention; response latency; and token/ruble usage. Initial release gates: all emitted citation IDs resolve, no unsupported bank attribution or invented company facts in reviewed cases, and at least 4/5 relevant top results on the small labeled demo set. Treat semantic support as a human-reviewed metric, not something proven by source-ID checks.
+
+For Layer 3, separately record calculation correctness, input/assumption completeness, recommendation consistency with the stated objective/constraints, and reviewer usefulness of the comparison. Compare Layer 2 alone with Layers 2+3 on the same example; a higher click count does not prove better financial decisions.
 
 Store useful/not useful feedback with company, role, insight, and reason. After importer, prompt, model, or scoring changes, rerun the pack and review failures. During the demo, inspect failed runs, daily usage, and negative feedback in a simple admin view/CLI report. Document a weekly expert sample review for continued use. No monitoring platform is necessary.
 
@@ -147,6 +183,8 @@ All twelve success criteria are included; references identify where they are imp
 
 The six constraints on pp. 11–12 map directly to these decisions: company-specific causal interpretation rather than summary; actual bank analysis that influences conclusions; feature-level personalization; approved models only; explicit unknown/conflict handling; and documented access, privacy, tool control, logging, and action boundaries. The six quality questions on p. 14 become the insight's six visible sections.
 
+The additional product direction maps to a distinct gate: Layers 1 and 2 must produce a grounded insight first; Layer 3 must demonstrate an editable comparison, reproducible scenario math, explicit trade-offs, and an objective-dependent next step. Describe calculated scenarios as **scenario outputs**, separate from source facts, bank views, and AI interpretation.
+
 ## 9. Documentation and submission package
 
 Keep documentation close to the implementation and use Mermaid diagrams that render on GitHub. These two planning documents establish the design; update them to describe the actual implementation and observed limitations.
@@ -154,8 +192,8 @@ Keep documentation close to the implementation and use Mermaid diagrams that ren
 | Artifact | Required content |
 |---|---|
 | `README.md` | Purpose, architecture summary, prerequisites, exact launch/test commands, model configuration and environment-variable names, components, demo journey, known limitations |
-| `docs/ARCHITECTURE.md` | Plain-language explanation plus component, pipeline, agent, workflow, and data-model diagrams; evidence and security boundaries; update proposed contracts to actual ones |
-| `docs/DEMO.md` | Exact click-through script, company/role comparisons, unseen-input and retry cases, recorded evaluation results, distinction between fixture and live checks |
+| `docs/ARCHITECTURE.md` | Plain-language explanation plus layer, component, pipeline, agent, workflow, and data-model diagrams; scenario formulas, evidence and security boundaries; update proposed contracts to actual ones |
+| `docs/DEMO.md` | Exact click-through script through all three layers, company/role comparisons, editable decision example, unseen-input and retry cases, recorded evaluation results, distinction between fixture and live checks |
 | `.env.example` | Non-secret placeholders for confirmed provider settings, model IDs, prices/budget, data location, demo mode; never a live key |
 | `Dockerfile`, `compose.yaml`, `pyproject.toml`, `uv.lock`, Python version pin | Single reproducible startup and pinned runtime/key dependencies |
 | Synthetic fixtures and demo users | Self-contained test journey; provenance and simulated fields clearly marked; data-use/redistribution limits respected |
@@ -166,7 +204,7 @@ FastAPI's generated OpenAPI can supply API reference without a separate document
 
 ## 10. Extension path and readiness boundary
 
-Add an industry through a profile mapping, a small exposure dictionary, and labeled examples. Add a source through an adapter returning the existing document schema. Change an inference model through the adapter and rerun the same evaluation pack. Keep schema, prompt, and scoring versions in stored runs so changes can be compared.
+Add an industry through a profile mapping, a small exposure dictionary, and labeled examples. Add a source through an adapter returning the existing document schema. Add a decision template only after the first works, with its own explicit inputs, formulas, assumptions and tests; FX or inventory decisions are possible later additions. Change an inference model through the adapter and rerun the same evaluation pack. Keep schema, prompt, scoring and calculation versions in stored runs so changes can be compared.
 
 SQLite and one app process are appropriate for this demo. If actual usage later demands it, move the repository layer to Postgres and expensive jobs to a worker; retain the contracts and original agent logic. There is no reason to build that infrastructure now.
 
