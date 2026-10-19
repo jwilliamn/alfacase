@@ -147,6 +147,8 @@ Company-specific terms have more influence than sector alone. A rate event can r
 
 One original orchestrator is enough. The model selects a structured analysis plan and tool arguments; Python enforces scope, schemas, budgets, and transitions. This produces real autonomous tool use without introducing a framework.
 
+The prototype uses a custom Python state machine, with no LangGraph, LangChain agent orchestration, or prebuilt multi-agent system. Specialized research, impact, verification and decision roles are functions/prompts within that shared workflow. This keeps the agent logic under our control and follows the brief's requirement to implement it ourselves.
+
 ```mermaid
 flowchart TD
     Start["Request: company, role, event, comparison or follow-up"] --> Scope["Authorize scope and load run context"]
@@ -270,7 +272,7 @@ sequenceDiagram
     end
     Agent->>DB: Save result, provenance and trace
     Agent-->>UI: Six-section insight with source links
-    User->>UI: Compare options; confirm inputs, objective and constraints
+    User->>UI: Compare options and confirm inputs, objective and constraints
     UI->>API: Request decision analysis linked to this insight
     API->>Calc: Validate and calculate two options across three scenarios
     Calc-->>API: Costs, baseline deltas, break-even and constraints
@@ -282,10 +284,10 @@ sequenceDiagram
     UI->>API: Recalculate with a new input version
     API->>Calc: Same formulas, updated inputs
     Calc-->>API: Updated figures and input version
-    API-->>UI: Updated figures; previous explanation marked stale
+    API-->>UI: Updated figures with previous explanation marked stale
     User->>UI: Ask follow-up or select another lens
     UI->>API: Question with insight ID and current scope
-    API->>Agent: Resume context; retrieve more evidence if needed
+    API->>Agent: Resume context and retrieve more evidence if needed
     Agent-->>UI: Cited answer or explicit evidence limit
     User->>UI: Mark useful / not useful
     UI->>API: Save feedback

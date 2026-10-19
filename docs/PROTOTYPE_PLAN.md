@@ -84,7 +84,7 @@ Use **Python 3.12, FastAPI, Jinja2, minimal vanilla JavaScript, SQLite/FTS5, and
 
 Run one app process. Ingestion is an explicit CLI/admin operation; insights are generated on demand. Rank all events cheaply, then analyze only the opened event or a small requested set. Cache document extraction and completed analyses. Scenario arithmetic runs locally and updates immediately when inputs change; rerun the model explanation only when requested, and mark any older explanation as belonging to the previous input version. No separate worker is necessary at demo scale.
 
-Use an original Python agent loop and local search. No external AI search service, hosted autonomous agent, or ready-made multi-agent system forms the core. Do not add an unapproved embedding LLM. Full diagrams and contracts are in [ARCHITECTURE.md](ARCHITECTURE.md).
+Use an original Python agent loop and local search. Keep orchestration in our own state machine; do not use LangGraph, LangChain agent orchestration, or a prebuilt multi-agent system. Specialized roles remain explicit functions/prompts with shared typed context. No external AI search service or hosted autonomous agent forms the core. Do not add an unapproved embedding LLM. Full diagrams and contracts are in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ### Retrieval: relational storage and a possible vector index
 
