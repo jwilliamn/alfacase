@@ -40,6 +40,10 @@ MOCKUP_TEST_PACKAGE=/tmp/alfacase-browser-check/package.json CHROMIUM_PATH=/usr/
 
 `MOCKUP_URL` can override the default server root on port 8080. `MOCKUP_REPORT_PATH` optionally writes the successful check list to JSON. The runner returns a nonzero exit status on failure.
 
+## Browser-file delivery check
+
+The chat visualization was observed to omit styles and fail to run scripts. The mockup is now also distributed as `alfacase-mockup.zip`, containing a self-contained `index.html` and launch instructions. The ZIP integrity and exact HTML contents were verified. Its extracted page was opened in Chromium through a local test server: CSS rendering, company switching, and the objective-dependent scenario recommendation passed, with no extra asset/service requests or uncaught browser errors. With JavaScript disabled, the page shows launch instructions instead of an empty main area. `browser-preview.png` was captured from the extracted page.
+
 ## What these results do not establish
 
 No live news collection, database, semantic retrieval, approved-model call, genuine agent retry, real bank material or bank authentication was exercised. The production architecture's Python Decimal calculator is not implemented; this mockup uses JavaScript arithmetic. The source and interpretation content remains explicitly synthetic or user-entered and unverified.

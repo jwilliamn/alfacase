@@ -4,7 +4,13 @@ A clickable Russian-language mockup of the three-layer product. It uses plain HT
 
 ## Open or run
 
-The easiest review artifact is [standalone.html](standalone.html): download it and open it in a browser. GitHub displays HTML source rather than hosting the page. All styles, scripts and data are embedded; no network is required by the mockup itself.
+Download [alfacase-mockup.zip](alfacase-mockup.zip), extract it, and open its `index.html` in a normal browser tab. The archive includes the complete self-contained page and a short README. No server, install or Internet connection is needed by the mockup itself.
+
+Do not use a chat visualization or source-code/file preview as the browser: it can strip styles, block scripts and show an unstyled shell or “An error occurred inside the visualization.” GitHub also displays HTML source rather than hosting the app. The [standalone HTML](standalone.html) remains available as a download for direct local opening.
+
+This image shows the actual rendered page, without relying on HTML visualization support:
+
+![Rendered browser preview](screenshots/browser-preview.png)
 
 For development, run this command from the repository root:
 
@@ -20,7 +26,7 @@ After changing the source files, rebuild the self-contained review artifact:
 python mockup/export.py
 ```
 
-The editable sources are `index.html`, `styles.css`, `data.js`, and `app.js`. Do not hand-edit the generated `standalone.html`.
+The editable sources are `index.html`, `styles.css`, `data.js`, and `app.js`. The export command rebuilds both `standalone.html` and the deterministic browser ZIP. Do not hand-edit those generated files.
 
 ## Five-minute walkthrough
 

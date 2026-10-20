@@ -10,7 +10,7 @@ The product has three layers:
 
 The prototype will demonstrate the third layer with one interactive financing comparison, using explicit inputs and deterministic calculations alongside the cited AI analysis.
 
-- [Interactive mockup](mockup/standalone.html): self-contained HTML; download and open in a browser. Includes live scenario calculations and clearly labeled synthetic content.
+- [Download the browser bundle](mockup/alfacase-mockup.zip): extract the ZIP and open its `index.html` in a normal browser. Chat/file visualizations may strip the styles and scripts.
 - [Run and explore the mockup](mockup/README.md): launch instructions, demo journey, screenshots, and implementation boundaries.
 - [Prototype plan](docs/PROTOTYPE_PLAN.md): scope, build order, acceptance checks, and coverage of the challenge requirements.
 - [Architecture and workflows](docs/ARCHITECTURE.md): component diagrams, ingestion pipeline, agent loop, user journey, data contracts, and worked example.
@@ -19,3 +19,5 @@ The prototype will demonstrate the third layer with one interactive financing co
 The plan is based on the supplied 19-page **«Альфа Хак: Новостная аналитика»** brief. Page references in the documentation refer to that PDF.
 
 **Status:** the frontend mockup works; the Python backend, actual news ingestion, retrieval, approved-model calls, and real bank-research integration are not implemented. Source and agent views are explicitly simulated. The architecture describes the intended implementation.
+
+![Rendered browser preview](mockup/screenshots/browser-preview.png)

@@ -24,6 +24,7 @@
 svg{width:18px;height:18px;flex-shrink:0}
 .skip-link{left:calc(var(--sidebar) + 12px);max-width:calc(100vw - var(--sidebar) - 24px)}
 .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.launch-fallback{max-width:760px;padding:30px;background:white;border:1px solid var(--line);border-radius:16px}.launch-fallback p,.launch-fallback li{font-size:16px;line-height:1.8;color:#526174}.launch-fallback ol{padding-left:22px}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 </style>
@@ -40,7 +41,15 @@ svg{width:18px;height:18px;flex-shrink:0}
   </aside>
   <div class="workspace">
     <header class="topbar"><div class="breadcrumb"><span>Рабочий стол</span><span>/</span><strong id="page-crumb">Бизнес-инсайты</strong></div><div class="top-actions"><span class="demo-pill">ДЕМО · СИНТЕТИЧЕСКИЕ ДАННЫЕ</span><button class="icon-button" data-action="guide" aria-label="Помощь" title="Как пройти демо">?</button><span class="avatar avatar-small">АС</span></div></header>
-    <main id="main" tabindex="-1"></main>
+    <main id="main" tabindex="-1">
+      <section class="launch-fallback">
+        <div class="eyebrow">ИНТЕРАКТИВНЫЙ МАКЕТ</div>
+        <h1>Бизнес-инсайты</h1>
+        <p>Предпросмотр не запустил интерактивный макет. Файловые предпросмотры могут блокировать стили и JavaScript.</p>
+        <ol><li>Скачайте пакет <strong>alfacase-mockup.zip</strong>.</li><li>Распакуйте его и откройте <strong>index.html</strong> в обычной вкладке браузера.</li></ol>
+        <noscript><p>JavaScript отключён. Для переключения компаний и сценарных расчётов включите его или откройте файл в другом браузере.</p></noscript>
+      </section>
+    </main>
     <footer class="page-footer"><span>Альфа·Бизнес · Концепция сервиса новостной аналитики</span><span>Информация для демонстрации, не рекомендация банка</span></footer>
   </div>
   <div id="overlay-root"></div>
